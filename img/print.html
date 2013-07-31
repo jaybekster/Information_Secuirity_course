@@ -1,0 +1,189 @@
+ 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<meta http-equiv="X-UA-Compatible" content="IE=8" />
+<meta charset="utf-8">
+ <link rel="stylesheet" href="../css/course.css">
+ <style>
+
+@page {
+  width: 99%;
+  heigth:99%;
+  margin: 0; float: none;
+}
+
+@media print{
+
+  body{
+ overflow: hidden;
+   font-family:PT Sans Narrow;
+   display:block;
+}
+  #info{display:none;}
+   img{display:block;}
+  .text{display:block;}
+      #theName{display:block;}
+      #theDate{display:block;}
+          #theDate0{color:black;}
+              #result{display:block;}
+
+  #theDate0{
+display:block;
+  } 
+ 
+
+}
+
+@media screen{
+  body{
+ overflow: hidden;
+ margin:0;
+font-family:PT Sans Narrow;
+display:none;
+}
+  #info{display:none;}
+  img{display:none;}
+  .text{display:none;}
+   #theName{display:none;}
+      #theDate{display:none;}
+        #result{display:none;}
+}
+
+ img {
+top:0px;
+left:0px;
+  position:absolute;
+ width:210mm;
+ padding:0px;
+margin:0px;}
+ 
+ #theName {
+ position:relative;
+ z-index: 105;
+ width:99%;
+ text-align:center;
+ font-size:2em;
+   font-family:PT Sans Narrow;
+ }
+
+  #result {
+ position:relative;
+ z-index: 105;
+ margin-top:10px;
+ width:99%;
+ text-align:center;
+ font-size:2em;
+  font-family:PT Sans Narrow;
+ font-weight:bold;
+ }
+
+  #status{
+ position:relative;
+ z-index: 105;
+ margin-top:10px;
+ width:99%;
+ text-align:center;
+ font-size:2em;
+  font-family:PT Sans Narrow;
+ font-weight:bold;
+ }
+  #theDate {
+ position:absolute;
+ z-index: 106;
+ bottom:2%;
+ width:99%;
+ text-align:center;
+ font-family:PT Sans Narrow;
+ display: none;
+ }
+
+  #theDate0{
+ position:absolute;
+ z-index: 106;
+ bottom:5%;
+ width:99%;
+color:white;
+ font-family:PT Sans Narrow;
+  } 
+ 
+  .text{
+ position:absolute;
+ z-index: 107;
+ top:36%;
+ width:64%;
+  height:200px;
+  font-size:1.5em;
+  float:right;
+  right:10px;
+ text-align:center;
+ 
+ }
+
+
+
+ </style>
+
+ <html onload="">
+
+    <head><title>Печать Сертификата</title></head>
+    <body>
+  <div id="info"><b>Что бы распечатать сертификат:</b>
+  <ol>
+  <li>Нажмите File=>Print Preview или Файл=>Предварительный просмотр</li>
+  <li>Увеличьте изображение сертификата, что бы оно занимало страницу целиком</li>
+  <li>Спрячьте верхние и нижние колонтитулы</li>
+  <li>Нажмите "Печать"</li>
+  </ol></div>
+  <img src="cert.jpg">
+ <div class="text">Настоящим удостоверяется, что
+<div id="theName"></div>
+Завершил курс <b>"Информационная безопасность"</b> с результатом
+<div id="result">20</div> <p>Со статусом:</p>
+<div id="status">Уровень:Эксперт</div>
+</div>
+<div id="theDate0"><span style="float:left;margin-left:45%" id="curDate"></span></div>
+    </body>
+<script language="JavaScript">
+
+var date =  new Date()
+function callName(){
+//var inname = prompt("Введите Ваше ФИО:","Иванов Иван Иванович");
+document.getElementById("theName").innerHTML = decodeURIComponent( escape(getValue("name")) ) ;
+  rang = ["Новичок","Знаток","Эксперт"];
+document.getElementById("result").innerHTML = getValue("score")+ " баллов"
+document.getElementById("status").innerHTML = "\""+rang[getValue("rang")]+"\""
+}
+callName();
+month  = ["Января","Февраля","Марта","Апреля","Мая","Июня","Июля","Августа","Сентября","Октября","Ноября","Декабря"]
+
+//document.getElementById("theDate").innerHTML = date.getFullYear();
+document.getElementById("curDate").innerHTML = date.getDate()+" "+month[date.getMonth()]+" "+date.getFullYear();
+
+function getValue(varname)
+{
+  var url = window.location.href;
+  var qparts = url.split("?");
+  if (qparts.length == 0)
+  {
+    return "";
+  }
+  var query = qparts[1];
+  var vars = query.split("&");
+  var value = "";
+  for (i=0;i<vars.length;i++)
+  {
+    var parts = vars[i].split("=");
+    if (parts[0] == varname)
+    {
+      value = parts[1];
+      break;
+    }
+  }
+  value = unescape(value);
+  value.replace(/\+/g," ");
+  return value;
+}
+
+window.print()
+
+</script>
+    </html>

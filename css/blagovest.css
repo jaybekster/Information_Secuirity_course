@@ -1,0 +1,10 @@
+@font-face {
+    font-family: 'Blagovest';
+    src: url('blagovest.eot');
+    src: url('blagovest.eot?#iefix') format('embedded-opentype'),
+         url('blagovest.woff') format('woff'),
+         url('blagovest.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+
+}

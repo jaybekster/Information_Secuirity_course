@@ -1,0 +1,47 @@
+<%
+filePath = "x-local://wt/web/webtutor/IS_0013/js/";
+date = Date();
+_temp = Day(date)+"."+Month(date)+"."+Year(date);
+fileName = "data_"+_temp+".js";
+try {
+cont = LoadUrlData(filePath+fileName);
+} catch(err) {
+cont = LoadUrlData(filePath+"data.js");
+PutUrlData(filePath+fileName, cont);
+}
+%>
+<%
+try{
+path = "x-local://wt/web/webtutor/IS_0013/js/data.js"; 
+data = Request.Form.GetProperty("data");
+PutUrlData(path, "VioAnc = " + data)
+} catch(err) {
+%><%=err%><%
+}
+
+if ( Request.Form.HasProperty("op_type") && Request.Form.GetProperty("op_type")== "delete") {
+	images = Request.Form.GetProperty("images");
+	images = images.split("/");
+	path = 'x-local://wt/web/webtutor/IS_0013/img/';
+	if (images.length>1){for (i=1; i<images.length; i++) {
+		fileSize = UrlFileSize(path+images[i]);
+		if (fileSize!=0) {
+			data = LoadUrlData(path+images[i]);
+			%><%=path+images[i]%><br><%
+			str1 = images[i].substr(0, images[i].indexOf("-")+1);
+			str2 = images[i].substr(images[i].indexOf("-")+1, images[i].length);
+			str3 = str2.substr(0, str2.indexOf("."));
+			str4 = images[i].substr(images[i].indexOf("."), images[i].length);
+			str3 = Int(str3)-1;
+			images[i] = str1 + String(str3) + str4;
+			PutUrlData(path+images[i], data);
+			%><%=path+images[i]%><%
+		}
+	}}
+	images = Request.Form.GetProperty("images");
+	images = images.split("/");
+	try {
+		DeleteDoc(path+images[images.length-1]);
+	} catch(err) { %><%=err%><% }	
+	}
+%>

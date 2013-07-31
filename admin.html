@@ -1,0 +1,388 @@
+﻿<%
+if ( Request.Form.HasProperty("file") && Request.Form.GetProperty("file") != "") {
+	_data_ref = Request.Form.GetProperty("file");
+	bytes = StrLen( _data_ref );
+	if (bytes >= 30720) {
+		%>Превышен лимит в 30кБ.<%
+	} else {
+		fileName = String(_data_ref.FileName);
+		dots = fileName.split(".");
+		fileType = dots[dots.length-1];
+		if (fileType!="jpg") {
+			%>Расширение файла не соответсвует изображению: должно быть "*.jpg."<%
+		} else {
+			fileName = Request.Form.GetProperty("filename");
+			xLocalFile = 'x-local://wt/web/webtutor/IS_0013/img/'+fileName;
+			PutUrlData(xLocalFile, _data_ref); 
+			fileSize = UrlFileSize(xLocalFile);
+			%>готово<%
+		}
+	}
+}
+
+%>
+<script type="text/javascript" src="js/data.js"></script>
+<script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="js/jquery.tmpl.min.js"></script>
+<script type="text/javascript" src="js/jquery.jeditable.js"></script>
+<script type="text/javascript" src="js/json2-min.js"></script>
+<style>
+
+title, title2 {
+	color: red;
+	font-weight: bold;
+}
+.violation td {
+padding-top: 50px;
+border-top:5px solid black;
+
+}
+td {
+  border: 1px solid #fff;
+  border-top:1px solid black;
+	border-bottom: 1px solid black;
+	height: 20px;
+}
+.nowIsEditing input {
+	width:100%;
+}
+.nowIsEditing textarea {
+	width:100%;
+	height:75px;
+}
+form>input[type="text"], input.filename {
+	display:none;
+}
+.room>div.room_pic img{
+	max-width:900px;
+}
+td.room a{
+	cursor:pointer;
+}
+tr.room {
+	text-align:center;
+}
+div.room_pic {
+	width:900px;
+	display:block-inline;
+	position:relative;
+	cursor: crosshair;
+}
+img.anchor {
+	position:absolute;
+}
+a.selected {
+	color:red;
+}
+</style>
+<table id="movieListBag" border="1">
+	<tbody>
+	</tbody>
+</table>
+
+<script id="objTmpl" type="text/x-jquery-tmpl">
+	<tr><td colspan="4"><button class="${id}"onclick="$('tr[id=${id}].violation, tr[id=${id}].properties, tr[id=${id}].addproperties, tr[id=${id}].show_place').toggle();">Правило №${index}</button></td></tr>
+	<tr class="violation" id="${id}">
+	<td class="editable title">{{html title}}</td>
+	<td colspan="2" class="editable title2">{{html title2}}</td>
+	<td><img src="img/${id}.jpg" /></td>
+	</tr>
+	<tr id="${id}" class="show_place">
+		<td colspan="4"><button onclick='$(this).closest("tr").next("tr.anchor").toggle()'>Изменить месторасположние</button></td>
+	</tr>
+	{{each $data.responces}}
+	<tr id="${id}" class="properties{{if $index<arrayCount}} newFalse"{{else}} newTrue"{{/if}}>
+	<td class="editable responces">{{html $value}}</td>
+	<td class="editable story">{{html $data.story[$index]}}</td>
+	<td class="editable exp">${$data.exp[$index]}</td>
+	<td><img src="img/${id}-${$index}.jpg" />
+		<form method="POST" action="<%=Request.Url%>" enctype="multipart/form-data">
+		<input type="file" name="file" />
+		<input type="text" name="filename" class="filename" />
+		</form>
+	</td>
+	</tr>
+	{{if $index==$data.responces.length-1}}
+	<tr id="${id}" class="addproperties">
+	<td colspan="4"><button class="addproperties">Добавить</button></td>
+	</tr>
+	{{/if}}
+	{{/each}}
+</script>
+<script id="anchorTmpl" type="text/x-jquery-tmpl">
+	<tr class="anchor" id="${linkId}" data-id="${id}" data-seen="${seen}">
+	<!--<td class="editable" data-type="level">${level}</td>-->
+	<td colspan="4" class="room" align="center" colspan="4" style="text-align:center">
+		<div class="room_pic" data-slide="${level}">
+		{{if level=='slide1'}}
+			<img class="pic_room" src="img/x5Office_0.png" />
+		{{/if}}
+		{{if level=='slide3'}}
+			<img class="pic_room" src="img/x5Office_1_01.png" />
+			<img class="pic_room" src="img/x5Office_1_02.png" />
+		{{/if}}
+		{{if level=='slide5'}}
+			<img class="pic_room" src="img/x5Office_2_01.png" />
+			<img class="pic_room" src="img/x5Office_2_02.png" />
+			<img class="pic_room" src="img/x5Office_2_03.png" />
+		{{/if}}
+		<img data-xpos="${left}" data-ypos="${top}" class="anchor" src="img/butt2.png" style="left:{{if left>100}}${$left=left%100}{{else}}${left}{{/if}}%; top:{{if top>100}}${$left=top%100}{{else}}${top}{{/if}}%" />
+		</div>
+		{{if level=='slide1'}}
+			<a data-img="img/x5Office_0.png">1</a>
+		{{/if}}
+		{{if level=='slide3'}}
+			<a data-img="img/x5Office_1_01.png">1</a>
+			<a data-img="img/x5Office_1_02.png">2</a>
+		{{/if}}
+		{{if level=='slide5'}}
+			<a data-img="img/x5Office_2_01.png">1</a>
+			<a data-img="img/x5Office_2_02.png">2</a>
+			<a data-img="img/x5Office_2_03.png">3</a>
+		{{/if}}
+	</td>
+	<!--<td class="position" collspan="2" data-type="top">{{if left>100}}${$left=left%100}{{else}}${left}{{/if}}% {{if top>100}}${$left=top%100}{{else}}${top}{{/if}}%</td>-->
+	</tr>
+</script>
+
+<script>
+var slides = ["slide1", "slide3", "slide5"];
+
+function changePositionValue(id, position) {
+	var length = VioAnc.anchors.length;
+	
+	for (var i=0; i<length; i++) {
+		if (VioAnc.anchors[i].id == id) {
+			VioAnc.anchors[i].top = position.top;
+			VioAnc.anchors[i].left = position.left;
+			break;
+		}
+	}
+}
+
+function changeDataValue($that, value) {
+	var temp;
+	var id = $that.closest("tr").attr("id");var length = VioAnc.violations.length; 
+	for (var i=0; i<length; i++) {
+		if (VioAnc.violations[i].id == id) {
+			temp = VioAnc.violations[i];
+			break;
+		}
+	}
+	var classes = ["title", "title2", "responces", "story", "exp"];
+	var length = classes.length;
+	for (var i=0; i<length; i++) {
+		if ($that.hasClass(classes[i])) {
+			if ($that.parent().hasClass("properties")) {
+				$that = $that.parent();
+				if (($that.is("tr")) && (value==undefined)) {
+					temp.responces.splice($("tr[id='"+id+"'].properties").index($that),1);
+					temp.story.splice($("tr[id='"+id+"'].properties").index($that),1);
+					temp.exp.splice($("tr[id='"+id+"'].properties").index($that),1);
+					return true;
+				}
+				temp = temp[classes[i]]; //определил класс
+				return temp[$("tr[id='"+id+"'].properties").index($that)] = value;
+			} else {
+				return temp[classes[i]] = value;
+			}
+		}
+	}
+}
+$.editable.addInputType('mine', {
+	element : function(settings, original) {
+		if ($(original).hasClass("story")) {
+			var input = $("<textarea>");
+		} else {
+			var input = $("<input />");
+		}
+		if ($(original).hasClass("exp")) {
+			$(this).keypress(function (e) {
+				if( e.which!=8 && e.which!=0 && (e.which<48 || e.which>57)) return false;
+			});
+		}
+		$(this).append(input);
+		return(input);
+	},
+     buttons : function(settings, original) {
+		var default_buttons = $.editable.types['defaults'].buttons
+		default_buttons.apply(this, [settings, original]);
+		var $td = $(original);
+		if ( $td.parent().hasClass("newTrue") ) {
+			var third = $('<input type="button" />');
+			third.val(settings.third);
+			$(this).append(third);
+			$(third).click(function() {
+				changeDataValue($td);
+				var $this = $td.parent();
+				var $temp = $($this).nextAll("#"+$this.attr("id")+".properties");
+				var temp = [];
+				$temp.each(function() {
+					if ($(this).find("img").attr("src")) {
+						var name = $(this).find("img").attr("src");
+						name = name.substr(name.lastIndexOf("/")+1, name.length);
+						temp.push(name);
+					}
+				})
+				if ($this.find("img").attr("src")) {
+					var name = $this.find("img").attr("src");
+					name = name.substr(name.lastIndexOf("/")+1, name.length);
+					temp.unshift(name);
+				}
+				$this.remove();
+				$.ajax({
+					type: "POST",
+					url: "js/_server_functions.html",
+					data: "op_type=delete&data="+JSON.stringify(VioAnc)+"&images="+temp.join("/")
+				}).done(function(msg) {
+					console.log(msg)
+				}).fail(function(msg) {
+					alert("error" + msg)
+				})
+			})
+		}
+     }
+});
+function editable() {//функция определяющая тип редатирования поля.
+	$('.editable').editable(
+		function(value, settings) {
+			if ($(this).hasClass("story"))	{
+				//var value = value.replace(/["\n"]/g, '<><p>')
+				var value = $.trim("<p>" + value.replace(/\n/g, '</p><p>') + "</p>");
+				console.log(value)
+			}
+			return value;
+	  }, {
+		cssclass : 'nowIsEditing',
+		type    : 'mine',
+		third: "Удалить данную строку",
+		submit  : 'Сохранить',
+		placeholder: "",
+		data: function(value, settings) {
+			if ($(this).hasClass("story")) {
+				var value = value.replace(/["<P>","<p>"]/g, '').replace(/["<\/P>","<\/p>"]/g, '\n');
+				//console.log(value)
+				return $.trim(value);
+			} else {
+				return value;
+			}
+		},
+		callback: function(value, settings) {
+			$this = $(this);
+			changeDataValue($this, value);
+			$.ajax({
+				type: "POST",
+				url: "js/_server_functions.html",
+				data: "data="+JSON.stringify(VioAnc)
+			}).done(function(msg) {
+				//document.location.reload();
+				console.log("done")
+			}).fail(function(msg) {
+				alert("error" + msg)
+			})
+		}
+	})
+}
+function addNewProperty(id) {
+	var DOMElement = $("<tr></tr>");
+	DOMElement.attr("id", id);
+	DOMElement.attr("class", "properties newTrue");
+	var propertyList = ["responces", "story", "exp", "img"];
+	var length = propertyList.length;
+	var newProperty = [];
+	for (var i=0; i<length; i++) {
+		DOMElement.append($("<td></td>", {
+			"class":"editable "+propertyList[i] }
+		))
+	}
+	DOMElement.children(":last").html('<img src="" /><form method="POST" action=<%=Request.Url%> enctype="multipart/form-data"><input type="file" name="file"/><input type="text" name="filename" class="filename" /></form>');
+	DOMElement.children(":last").removeClass("editable");
+	return DOMElement;
+}
+
+$(document).ready(function() {
+i = 0;
+$('#objTmpl').tmpl(VioAnc.violations,index=function() {return(++i)}).appendTo('#movieListBag>tbody');
+delete i;
+$("#anchorTmpl").tmpl(VioAnc.anchors).appendTo('#movieListBag>tbody');
+
+$("tr.anchor").each(function() {
+	$("tr#"+$(this).attr("id")+".violation").next().after($(this));
+})
+
+editable();
+
+$("tr.anchor").hide();
+$("tr.violation, tr.show_place, tr.properties, tr.addproperties").hide();
+$("div.room_pic").each(function() {
+	var num = $(this).children(".anchor").data("xpos");
+	var $this = $(this).children("img.pic_room").eq(parseInt(num/100));
+	$this.siblings("img.pic_room").hide();
+	$(this).parent().children("a").eq(parseInt(num/100)).addClass("selected");
+})
+$(".anchor").on("click", "a", function() {
+	var $this = $(this);
+	$this.addClass("selected").siblings("a").removeClass("selected");
+	$this.prevAll("div.room_pic").children("img").hide().eq( $this.html()-1 ).show();
+	$this = $this.prevAll("div.room_pic").children("img").eq( $this.html()-1 );
+	$this = $($this.siblings(".anchor")[0]);
+	if (parseInt($this.attr("data-xpos")/100)==($(this).html()-1)) {
+		$this.show();
+	} else {
+		$this.hide();
+	}
+})
+
+$(".room > IMG.anchor").css("position","absolute");
+
+$("table#movieListBag").on("click", "button.addproperties", function() {
+	var $this = $(this).closest("tr");
+	newPropterty = new addNewProperty($this.attr("id"));
+	$this.before($(newPropterty));
+	editable();
+}).on("change", "input[type='file']", function() {
+	var filename = $(this).closest("tr").attr("id");
+	if ($(this).closest("tr").hasClass("properties")) {
+		filename+="-" + $("tr[id='"+filename+"'].properties").index($(this).closest("tr"));
+	}
+	filename+=".jpg";
+	$(this).next().val(filename);
+	$(this).closest("form").submit();
+}).on("click", "div.room_pic>img.pic_room", function(e) {
+	var $this = $(this);
+	var $index = $this.parent().children("img.pic_room").index($this);
+	x = e.pageX-$this.offset().left-25;
+	y = e.pageY-$this.offset().top-25;
+	x = Math.round(x/$this.width() * 100);
+	y = Math.round(y/$this.height() * 100);
+	var $anchor = $this.nextAll(".anchor");
+	if ($anchor.hide()) $anchor.show();
+	$anchor.css({"left":x+"%", "top":y+"%"});
+	$anchor.attr("data-xpos", parseInt($index.toString()+"00") + x).attr("data-ypos", y);
+	changePositionValue($this.closest("tr.anchor").data("id"), {left:$anchor.attr("data-xpos"), top:$anchor.attr("data-ypos")});
+	$.ajax({
+		type: "POST",
+		url: "js/_server_functions.html",
+		data: "data="+JSON.stringify(VioAnc)
+	}).done(function(msg) {
+		//document.location.reload();
+		console.log("done")
+	}).fail(function(msg) {
+		alert("error" + msg)
+	})
+	$this.closest("td").next("td.position").html(x+"% "+y+"%");
+	
+})
+
+})
+
+/*
+$("td").each(function() {
+	if ( $(this).html()=="" || $(this).html()=="<p></p>") {
+	$(this).animate({"backgroundColor": "red"}, 5000);
+} else {
+	$(this).animate({"backgroundColor": "transparent"}, 3000);
+	}
+})
+*/
+</script>
